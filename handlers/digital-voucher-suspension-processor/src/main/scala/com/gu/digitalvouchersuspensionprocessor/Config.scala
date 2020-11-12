@@ -1,25 +1,26 @@
 package com.gu.digitalvouchersuspensionprocessor
 
+import com.gu.digitalvouchersuspensionprocessor.ConfigLoader.Service.Salesforce
+import com.gu.digitalvouchersuspensionprocessor.ConfigLoader.{ConfigLoadFailure, Service, loadFromEnvironment, loadFromSecretsManager}
 import com.gu.imovo.ImovoConfig
 import com.gu.salesforce.SFAuthConfig
+import com.gu.util.config.Stage.Dev
 
 case class Config(salesforce: SFAuthConfig, imovo: ImovoConfig)
 
 object Config {
 
-  def envVal(name: String): Either[ConfigFailure, String] =
-    sys.env.get(name).toRight(ConfigFailure(s"No value in environment for '$name'"))
-
-  def fromEnv(): Either[ConfigFailure, Config] =
+  def fromEnv(): Either[ConfigLoadFailure, Config] =
     for {
-      sfUrl <- envVal("salesforceUrl")
-      sfClientId <- envVal("salesforceClientId")
-      sfClientSecret <- envVal("salesforceClientSecret")
-      sfUserName <- envVal("salesforceUserName")
-      sfPassword <- envVal("salesforcePassword")
-      sfToken <- envVal("salesforceToken")
-      imovoUrl <- envVal("imovoUrl")
-      imovoApiKey <- envVal("imovoApiKey")
+      sfSecret <- loadFromSecretsManager(Salesforce)("User/MembersDataAPI")
+      sfUrl <- loadFromEnvironment("salesforceUrl")
+      sfClientId <- loadFromEnvironment("salesforceClientId")
+      sfClientSecret <- loadFromEnvironment("salesforceClientSecret")
+      sfUserName <- loadFromEnvironment("salesforceUserName")
+      sfPassword <- loadFromEnvironment("salesforcePassword")
+      sfToken <- loadFromEnvironment("salesforceToken")
+      imovoUrl <- loadFromEnvironment("imovoUrl")
+      imovoApiKey <- loadFromEnvironment("imovoApiKey")
     } yield Config(
       salesforce = SFAuthConfig(
         url = sfUrl,

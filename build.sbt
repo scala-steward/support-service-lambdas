@@ -469,6 +469,7 @@ lazy val `digital-voucher-suspension-processor` = lambdaProject(
     awsLambda,
     sttpAsyncHttpClientBackendCats,
     sttpOkhttpBackend,
+    secretsManager,
     scalatest,
     scalaMock
   )

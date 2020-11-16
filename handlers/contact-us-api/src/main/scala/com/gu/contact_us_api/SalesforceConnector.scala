@@ -4,10 +4,11 @@ import com.gu.contact_us_api.models.{ContactUsConfig, ContactUsError, SFAuthFail
 import com.gu.contact_us_api.ParserUtils._
 import io.circe.generic.auto._
 import io.circe.syntax._
+import com.gu.util.Logging
 import scalaj.http.{Http, HttpRequest, HttpResponse}
 
 
-class SalesforceConnector(runRequest: HttpRequest => Either[ContactUsError, HttpResponse[String]]) {
+class SalesforceConnector(runRequest: HttpRequest => Either[ContactUsError, HttpResponse[String]]) extends Logging {
 
   def handle(req: SFCompositeRequest): Either[ContactUsError, Unit] = {
     for {
@@ -43,6 +44,7 @@ class SalesforceConnector(runRequest: HttpRequest => Either[ContactUsError, Http
   }
 
   def sendReq(env: ContactUsConfig, token: String, request: SFCompositeRequest): Either[ContactUsError, Unit] = {
+    logger.info("outbound request: " + request.asJson.toString())
     runRequest(
       Http(env.reqEndpoint)
         .header("Content-Type", "application/json")

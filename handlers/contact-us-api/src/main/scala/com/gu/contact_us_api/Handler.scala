@@ -25,6 +25,7 @@ class Handler extends RequestHandler[APIGatewayProxyRequestEvent, APIGatewayProx
   def process(reqBody: String, handle: SFCompositeRequest => Either[ContactUsError, Unit]): APIGatewayProxyResponseEvent = {
     val result = for {
       req <- decode[ContactUsRequest](reqBody, Some("ContactUsRequest"), "Input")
+      _ = logger.info("inbound request: " + req.message)
       resp <- handle(req.asSFCompositeRequest)
     } yield resp
 
